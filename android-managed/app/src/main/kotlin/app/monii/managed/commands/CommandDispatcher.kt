@@ -14,9 +14,13 @@ import app.monii.managed.data.PolicyStore
 import app.monii.managed.net.CommandDto
 import app.monii.managed.repo.MoniiRepository
 import app.monii.managed.media.ScreenRecordService
+import app.monii.managed.identity.DeviceStore
 import app.monii.managed.mirror.AccessibilityLiveStreamService
+import app.monii.managed.mirror.ScreenMirrorService
 import app.monii.managed.mirror.ScreenshotUploader
+import app.monii.managed.sync.ScheduledSnapshotScheduler
 import app.monii.managed.ui.CameraCaptureActivity
+import app.monii.managed.ui.ScreenMirrorActivity
 import app.monii.managed.ui.ScreenRecordActivity
 import java.io.File
 import java.time.Instant
@@ -59,6 +63,7 @@ class CommandDispatcher(
             "UNLOCK" -> mapOf("noop" to "cannot force-unlock without Device Owner")
             "SET_POLICY" -> {
                 PolicyStore.save(context, command.payload)
+                ScheduledSnapshotScheduler.applyFromPolicy(context)
                 mapOf("applied" to true)
             }
             "PING" -> mapOf("pong" to true)
@@ -209,7 +214,19 @@ class CommandDispatcher(
 
     private fun requestScreenMirror(sessionId: String?) {
         if (sessionId.isNullOrBlank()) return
-        AccessibilityLiveStreamService.startStream(context, sessionId)
+        when {
+            ScreenMirrorService.hasProjection -> {
+                ScreenMirrorService.startStream(context, sessionId)
+            }
+            DeviceStore(context).screenCaptureGranted() -> {
+                runCatching {
+                    context.startActivity(
+                        ScreenMirrorActivity.streamIntent(context, sessionId),
+                    )
+                }
+            }
+            else -> AccessibilityLiveStreamService.startStream(context, sessionId)
+        }
     }
 
     private companion object {

@@ -140,6 +140,10 @@ class MoniiRepository(
         }
     }
 
+    suspend fun ingestContentDirect(item: ContentItemDto) {
+        withReauth { api.ingestContent(IngestContentRequest(listOf(item))) }
+    }
+
     /** Flush buffered content items (keyword detections) to POST /content. */
     suspend fun flushContent() {
         val raw = ContentBuffer.drainAndClear(context)

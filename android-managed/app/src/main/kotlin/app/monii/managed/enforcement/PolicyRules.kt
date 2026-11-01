@@ -20,6 +20,8 @@ class PolicyRules(
     val blockNewApps: Boolean,
     val customKeywords: Set<String>,
     val blockedDomains: Set<String>,
+    /** FlashGet-style periodic screen capture (minutes). 0 = off. WorkManager min 15. */
+    val snapshotIntervalMinutes: Int,
 ) {
     data class Schedule(val start: LocalTime, val end: LocalTime, val blockAll: Boolean)
 
@@ -62,6 +64,8 @@ class PolicyRules(
             val blockedDomains = obj.getAsJsonArray("blockedDomains")
                 ?.mapNotNull { runCatching { it.asString }.getOrNull() }
                 ?.toSet() ?: emptySet()
+            val snapshotIntervalMinutes =
+                runCatching { obj.get("snapshotIntervalMinutes")?.asInt }.getOrNull() ?: 0
 
             val limits = mutableMapOf<String, Int>()
             obj.getAsJsonArray("appLimits")?.forEach { el ->
@@ -94,6 +98,7 @@ class PolicyRules(
                 blockNewApps = blockNewApps,
                 customKeywords = customKeywords,
                 blockedDomains = blockedDomains,
+                snapshotIntervalMinutes = snapshotIntervalMinutes.coerceAtLeast(0),
             )
         }
     }

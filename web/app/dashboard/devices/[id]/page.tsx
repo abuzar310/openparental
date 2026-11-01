@@ -82,6 +82,7 @@ export default function DeviceDetailPage() {
       cards: [
         { icon: '🖥️', label: 'Screen mirror', href: `${base}/screen?mode=mirror` },
         { icon: '📸', label: 'Screenshot now', href: `${base}/screen?mode=screenshot` },
+        { icon: '🕐', label: 'Scheduled snapshots', href: `${base}/feed/scheduled` },
         { icon: '📷', label: 'Camera snapshot', cmd: { type: 'CAMERA_SNAPSHOT', payload: { camera: 'front' } } },
         { icon: '🖼️', label: 'Camera gallery', href: `${base}/feed/camera` },
         { icon: '🎙️', label: 'Ambient audio', cmd: { type: 'AMBIENT_RECORD', payload: { action: 'start' } } },

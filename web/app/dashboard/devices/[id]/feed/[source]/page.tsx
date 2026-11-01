@@ -63,6 +63,12 @@ const META: Record<
     sources: [],
     empty: 'No new gallery activity flagged yet. Grant Photos access on the child device.',
   },
+  scheduled: {
+    title: 'Scheduled snapshots',
+    icon: '🕐',
+    sources: ['scheduled_snapshot'],
+    empty: 'No scheduled snapshots yet. Set interval under App rules.',
+  },
 };
 
 export default function FeedPage() {
@@ -144,7 +150,8 @@ export default function FeedPage() {
                   {new Date(c.occurredAt).toLocaleString()}
                 </time>
               </div>
-              {c.source === 'camera' && c.body.length > 100 ? (
+              {(c.source === 'camera' || c.source === 'scheduled_snapshot') &&
+              c.body.length > 100 ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={`data:image/jpeg;base64,${c.body}`}

@@ -374,9 +374,9 @@ class ScreenMirrorService : Service() {
         const val ACTION_STOP_STREAM = "app.monii.managed.STOP_STREAM"
         const val ACTION_STOP_ALL = "app.monii.managed.STOP_MIRROR"
 
-        private const val TARGET_WIDTH = 720
-        private const val JPEG_QUALITY = 55
-        private const val FRAME_INTERVAL_MS = 400L
+        private const val TARGET_WIDTH = 1080
+        private const val JPEG_QUALITY = 60
+        private const val FRAME_INTERVAL_MS = 200L
 
         @Volatile
         var hasProjection: Boolean = false

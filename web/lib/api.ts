@@ -279,6 +279,8 @@ export type PolicyRules = {
   blockAllExceptAllowed?: boolean;
   blockNewApps?: boolean;
   customKeywords?: string[];
+  /** Periodic screen capture on child (minutes). 0 = off. Min 15 on device. */
+  snapshotIntervalMinutes?: number;
 };
 
 export async function getPolicy(): Promise<PolicyRules> {

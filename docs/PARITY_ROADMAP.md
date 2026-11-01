@@ -24,7 +24,7 @@ References: [`research/FLASHGET_REA.md`](../research/FLASHGET_REA.md), [`FLASHGE
 
 ### Phase 2 — Live monitoring (FlashGet-grade)
 
-- [ ] **WebRTC** screen path (replace or complement JPEG / a11y relay)
+- [ ] **WebRTC** screen path (replace or complement JPEG / a11y relay; MediaProjection socket mirror is live)
 - [ ] Remote camera snapshot **upload to parent** (end-to-end)
 - [ ] Screen record pipeline + parent gallery
 - [x] **Albums safety** (gallery metadata flags → parent feed)

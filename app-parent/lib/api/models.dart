@@ -160,6 +160,29 @@ class GeofencePlace {
       );
 }
 
+class PhotoFlag {
+  final String id;
+  final String category;
+  final double confidence;
+  final DateTime occurredAt;
+
+  PhotoFlag({
+    required this.id,
+    required this.category,
+    required this.confidence,
+    required this.occurredAt,
+  });
+
+  factory PhotoFlag.fromJson(Map<String, dynamic> j) => PhotoFlag(
+        id: j['id'] as String,
+        category: (j['category'] as String?) ?? 'unknown',
+        confidence: (j['confidence'] as num?)?.toDouble() ?? 0,
+        occurredAt: j['occurredAt'] != null
+            ? DateTime.parse(j['occurredAt'] as String)
+            : DateTime.now(),
+      );
+}
+
 class ContentItem {
   final String id;
   final String source;

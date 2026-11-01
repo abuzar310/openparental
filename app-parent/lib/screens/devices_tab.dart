@@ -10,13 +10,20 @@ import '../widgets/feature_tile.dart';
 import '../widgets/gradient_header.dart';
 import '../widgets/ui.dart';
 import 'blocked_apps_screen.dart';
+import 'browser_safety_screen.dart';
+import 'call_sms_safety_screen.dart';
+import 'content_feed_screen.dart';
 import 'device_info_screen.dart';
+import 'keyword_detection_screen.dart';
 import 'live_mirror_screen.dart';
 import 'location_history_screen.dart';
 import 'location_screen.dart';
+import 'notifications_screen.dart';
 import 'pairing_screen.dart';
 import 'setup_wizard_screen.dart';
 import 'snapshot_screen.dart';
+import 'usage_logs_screen.dart';
+import 'watch_history_screen.dart';
 
 /// Device hub: gradient header with a device selector, then sectioned
 /// feature grids (the reference "Device" tab pattern).
@@ -38,15 +45,34 @@ class DevicesTab extends ConsumerWidget {
     }
   }
 
-  Future<void> _command(BuildContext context, WidgetRef ref, String deviceId,
-      String type, String label) async {
+  Future<void> _command(
+    BuildContext context,
+    WidgetRef ref,
+    String deviceId,
+    String type,
+    String label, [
+    Map<String, dynamic>? payload,
+  ]) async {
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await ref.read(apiProvider).sendCommand(deviceId, type);
+      await ref.read(apiProvider).sendCommand(deviceId, type, payload);
       messenger.showSnackBar(SnackBar(content: Text('$label sent')));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Failed: $e')));
     }
+  }
+
+  void _openFeed(BuildContext context, Device device, String feedKey) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ContentFeedScreen(
+          deviceId: device.id,
+          deviceName: device.name,
+          feedKey: feedKey,
+        ),
+      ),
+    );
   }
 
   void _switchDevice(
@@ -165,30 +191,94 @@ class DevicesTab extends ConsumerWidget {
                   tiles: [
                     FeatureTile(
                       icon: Icons.screen_share_rounded,
-                      label: 'Live screen',
+                      label: 'Screen mirror',
                       color: AppColors.online,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                            builder: (_) => LiveMirrorScreen(device: device)),
+                          builder: (_) => LiveMirrorScreen(device: device),
+                        ),
                       ),
                     ),
                     FeatureTile(
-                      icon: Icons.camera_alt_rounded,
-                      label: 'Snapshot & record',
+                      icon: Icons.photo_camera_rounded,
+                      label: 'Screenshot',
                       color: AppColors.brand,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                            builder: (_) => SnapshotScreen(device: device)),
+                          builder: (_) => LiveMirrorScreen(
+                            device: device,
+                            mode: 'screenshot',
+                          ),
+                        ),
                       ),
                     ),
                     FeatureTile(
-                      icon: Icons.lock_rounded,
-                      label: 'Lock now',
+                      icon: Icons.schedule_rounded,
+                      label: 'Scheduled snaps',
+                      color: AppColors.offline,
+                      onTap: () => _openFeed(context, device, 'scheduled'),
+                    ),
+                    FeatureTile(
+                      icon: Icons.camera_alt_rounded,
+                      label: 'Camera',
+                      color: AppColors.brand,
+                      onTap: () => _command(
+                        context,
+                        ref,
+                        device.id,
+                        'CAMERA_SNAPSHOT',
+                        'Camera snapshot',
+                        {'camera': 'front'},
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.collections_rounded,
+                      label: 'Camera gallery',
+                      color: AppColors.offline,
+                      onTap: () => _openFeed(context, device, 'camera'),
+                    ),
+                    FeatureTile(
+                      icon: Icons.hearing_rounded,
+                      label: 'One-way audio',
+                      color: AppColors.attention,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => SnapshotScreen(device: device),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.fiber_manual_record_rounded,
+                      label: 'Screen record',
                       color: AppColors.alert,
-                      onTap: () =>
-                          _command(context, ref, device.id, 'LOCK', 'Lock'),
+                      onTap: () => _command(
+                        context,
+                        ref,
+                        device.id,
+                        'SCREEN_RECORD',
+                        'Screen record',
+                        {'action': 'start'},
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.video_library_rounded,
+                      label: 'Recordings',
+                      color: AppColors.alert,
+                      onTap: () => _openFeed(context, device, 'recordings'),
+                    ),
+                    FeatureTile(
+                      icon: Icons.tune_rounded,
+                      label: 'More live tools',
+                      color: AppColors.brand,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => SnapshotScreen(device: device),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -198,18 +288,31 @@ class DevicesTab extends ConsumerWidget {
                   tiles: [
                     FeatureTile(
                       icon: Icons.location_on_rounded,
-                      label: 'Locate',
+                      label: 'Live location',
                       color: AppColors.brand,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                            builder: (_) => LocationScreen(device: device)),
+                          builder: (_) => LocationScreen(device: device),
+                        ),
                       ),
                     ),
                     FeatureTile(
-                      icon: Icons.map_rounded,
-                      label: 'History & geofence',
+                      icon: Icons.history_rounded,
+                      label: 'Location history',
                       color: AppColors.offline,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              LocationHistoryScreen(device: device),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.fence_rounded,
+                      label: 'Geofences',
+                      color: AppColors.online,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
@@ -222,18 +325,142 @@ class DevicesTab extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 FeatureSection(
-                  title: 'Rules & device',
+                  title: 'Screen time & rules',
                   tiles: [
                     FeatureTile(
+                      icon: Icons.timeline_rounded,
+                      label: 'Usage & activity',
+                      color: AppColors.brand,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => UsageLogsScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
                       icon: Icons.block_rounded,
-                      label: 'Family policy',
+                      label: 'App rules',
                       color: AppColors.attention,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                            builder: (_) => const BlockedAppsScreen()),
+                          builder: (_) => const BlockedAppsScreen(),
+                        ),
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                FeatureSection(
+                  title: 'Communication',
+                  tiles: [
+                    FeatureTile(
+                      icon: Icons.phone_rounded,
+                      label: 'Calls',
+                      color: AppColors.online,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => CallSmsSafetyScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.sms_rounded,
+                      label: 'Messages',
+                      color: AppColors.brand,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => CallSmsSafetyScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                            initialTab: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                FeatureSection(
+                  title: 'Content safety',
+                  tiles: [
+                    FeatureTile(
+                      icon: Icons.language_rounded,
+                      label: 'Browser',
+                      color: AppColors.offline,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => BrowserSafetyScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.notifications_rounded,
+                      label: 'Notifications',
+                      color: AppColors.attention,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => NotificationsScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.flag_rounded,
+                      label: 'Keywords',
+                      color: AppColors.alert,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => KeywordDetectionScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.play_circle_rounded,
+                      label: 'Watch history',
+                      color: AppColors.brand,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => WatchHistoryScreen(
+                            deviceId: device.id,
+                            deviceName: device.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.photo_library_rounded,
+                      label: 'Albums safety',
+                      color: AppColors.online,
+                      onTap: () => _openFeed(context, device, 'albums'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                FeatureSection(
+                  title: 'Device',
+                  tiles: [
                     FeatureTile(
                       icon: Icons.smartphone,
                       label: 'Device info',
@@ -241,8 +468,16 @@ class DevicesTab extends ConsumerWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                            builder: (_) => DeviceInfoScreen(device: device)),
+                          builder: (_) => DeviceInfoScreen(device: device),
+                        ),
                       ),
+                    ),
+                    FeatureTile(
+                      icon: Icons.lock_rounded,
+                      label: 'Lock now',
+                      color: AppColors.alert,
+                      onTap: () =>
+                          _command(context, ref, device.id, 'LOCK', 'Lock'),
                     ),
                     FeatureTile(
                       icon: Icons.qr_code_rounded,

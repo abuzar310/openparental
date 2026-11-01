@@ -8,7 +8,7 @@ Source of truth: [`research/flashget/reference/FEATURE_PARITY.json`](../research
 |-----------------|----------------|--------------|
 | **WebRTC / LiteAV mirror** | HD screen + remote camera stream | Phase 2 transport; today a11y JPEG ~1fps |
 | **Albums Safety (full)** | On-device ML + optional WiFi image download | We only send metadata `PhotoFlag`; no thumbnails |
-| **Scheduled snapshots** | `ScreenSnapshot` / cron captures | Not built |
+| **Scheduled snapshots** | `ScreenSnapshot` / cron captures | **On** — policy `snapshotIntervalMinutes` + WorkManager |
 | **Payment / ads / redeem** | Monetization | Out of scope (self-hosted) |
 
 ## Partial (works but weaker than FlashGet)

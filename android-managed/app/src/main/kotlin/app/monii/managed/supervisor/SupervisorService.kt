@@ -25,6 +25,7 @@ import app.monii.managed.identity.DeviceStore
 import app.monii.managed.mqtt.MqttClientManager
 import app.monii.managed.repo.MoniiRepository
 import app.monii.managed.survival.SurvivalLog
+import app.monii.managed.sync.ScheduledSnapshotScheduler
 import app.monii.managed.sync.SyncScheduler
 import app.monii.managed.tamper.TamperWatchdog
 import kotlinx.coroutines.CoroutineScope
@@ -78,6 +79,7 @@ class SupervisorService : Service() {
         handler.removeCallbacks(heartbeat)
         handler.post(heartbeat)
         SyncScheduler.schedule(this)
+        ScheduledSnapshotScheduler.applyFromPolicy(this)
         startSyncLoop()
         startMqtt()
         return START_STICKY

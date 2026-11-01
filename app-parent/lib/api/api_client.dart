@@ -211,6 +211,16 @@ class ApiClient {
 
   // ---- content / keyword detection ----
 
+  Future<List<PhotoFlag>> getPhotoFlags(String deviceId, {int limit = 100}) async {
+    final r = await _dio.get<dynamic>(
+      '/devices/$deviceId/photo-flags',
+      queryParameters: {'limit': limit.toString()},
+    );
+    return (r.data as List)
+        .map((e) => PhotoFlag.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<List<ContentItem>> getContent(String deviceId,
       {String? source}) async {
     final query = <String, dynamic>{};

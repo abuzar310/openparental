@@ -29,6 +29,7 @@ export default function RulesPage() {
   const [blockAllExceptAllowed, setBlockAllExceptAllowed] = useState(false);
   const [blockNewApps, setBlockNewApps] = useState(false);
   const [customKeywords, setCustomKeywords] = useState('');
+  const [snapshotIntervalMinutes, setSnapshotIntervalMinutes] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -52,6 +53,7 @@ export default function RulesPage() {
       setBlockAllExceptAllowed(r.blockAllExceptAllowed ?? false);
       setBlockNewApps(r.blockNewApps ?? false);
       setCustomKeywords((r.customKeywords ?? []).join('\n'));
+      setSnapshotIntervalMinutes(r.snapshotIntervalMinutes ?? 0);
       const bed = (r.schedules ?? []).find((s) => s.blockAll);
       if (bed) {
         setBedtimeOn(true);
@@ -123,6 +125,7 @@ export default function RulesPage() {
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean),
+      snapshotIntervalMinutes: snapshotIntervalMinutes > 0 ? snapshotIntervalMinutes : 0,
     };
     try {
       await updatePolicy(rules);
@@ -181,6 +184,24 @@ export default function RulesPage() {
               Any app installed from now on is blocked until you allow it.
             </span>
           </span>
+        </label>
+        <label className="block mt-4 text-sm">
+          <b>Scheduled screen snapshots</b>
+          <span className="block text-xs text-muted mb-2">
+            FlashGet-style automatic captures (minutes between shots). Device minimum
+            interval is 15 minutes. 0 = off.
+          </span>
+          <input
+            type="number"
+            min={0}
+            max={1440}
+            step={15}
+            value={snapshotIntervalMinutes}
+            onChange={(e) =>
+              setSnapshotIntervalMinutes(Math.max(0, Number(e.target.value) || 0))
+            }
+            className="w-full rounded-xl border border-line bg-white p-2"
+          />
         </label>
       </section>
 

@@ -10,10 +10,12 @@ import '../theme/app_theme.dart';
 class CallSmsSafetyScreen extends ConsumerStatefulWidget {
   final String deviceId;
   final String deviceName;
+  final int initialTab;
   const CallSmsSafetyScreen({
     super.key,
     required this.deviceId,
     required this.deviceName,
+    this.initialTab = 0,
   });
 
   @override
@@ -32,7 +34,11 @@ class _CallSmsSafetyScreenState extends ConsumerState<CallSmsSafetyScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab.clamp(0, 1),
+    );
     _loadData();
   }
 
