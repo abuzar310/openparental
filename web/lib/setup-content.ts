@@ -54,8 +54,8 @@ export const setupSteps: SetupStep[] = [
     summary: 'A short code links the kid phone to your family.',
     body: [
       'In the parent app or web dashboard, open Pair and tap Create pairing code.',
-      'You will see a code like ABCD-EFGH and a QR token — keep this screen open.',
-      'On the child phone, open OpenParental, enter the code (or scan if your build supports it), and finish pairing.',
+      'You will see a QR code and a short code like ABCD-EFGH — keep this screen open.',
+      'On the child phone, open OpenParental, tap Scan QR code, or enter the server URL and code manually.',
       'When pairing succeeds, the child app shows Protected & online and the device appears in your Device list.',
     ],
   },
